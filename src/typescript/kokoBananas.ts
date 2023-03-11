@@ -1,55 +1,57 @@
 // 875
 
+const canEatAll = (piles: number[], speed: number, h: number) => {
+  let totalTime = 0;
+  for (const bananasPile of piles) {
+    totalTime += Math.ceil(bananasPile / speed);
+    if (totalTime > h) return false;
+  }
+  return true;
+};
+
 function minEatingSpeed(piles: number[], h: number): number {
-  const sortedPiles = [...piles].sort((a, b) => b - a);
-  const baseRounds = piles.length;
-  const availableExtraRounds = h - piles.length;
-  const max = sortedPiles[0];
+  let left = 1;
+  let right = Math.max(...piles);
 
-  // TODO: There is a problem because this function ignores the baseRounds
-  const getUsedRounds = (k: number) =>
-    baseRounds +
-    sortedPiles
-      .slice(0, availableExtraRounds)
-      .map((p) => Math.ceil(p / k - 1))
-      .reduce((a, b) => a + b, 0);
-
-  return bisectionSearch({
-    min: 1,
-    max,
-    getUsedRounds: getUsedRounds,
-    target: h,
-  });
-}
-
-interface BSArgs {
-  min: number;
-  max: number;
-  getUsedRounds: (k: number) => number;
-  target: number;
-}
-/** Finds a K that makes the cb return target. */
-const bisectionSearch = (args: BSArgs): number => {
-  const { min, max, getUsedRounds, target } = args;
-  const middle = Math.floor((max + min) / 2);
-  const usedRounds = getUsedRounds(middle);
-
-  if (usedRounds === target) return middle;
-
-  // k should be higher
-  if (usedRounds > target) {
-    const newMin = middle;
-    // best case found
-    if (newMin > max) return middle;
-    return bisectionSearch({ ...args, min: newMin });
+  while (left <= right) {
+    const mid = Math.floor(left + (right - left) / 2);
+    if (canEatAll(piles, mid, h)) {
+      right = mid - 1;
+    } else {
+      left = mid + 1;
+    }
   }
 
-  // K should be smaller
-  const newMax = middle - 1;
-  if (newMax < min) return middle;
-  return bisectionSearch({ ...args, max: newMax });
-};
+  return left;
+}
 
 // minEatingSpeed([312884470], 312884469);
 // minEatingSpeed([3, 6, 7, 11], 8);
-minEatingSpeed([30, 11, 23, 4, 20], 6);
+// minEatingSpeed([30, 11, 23, 4, 20], 5);
+// minEatingSpeed([30, 11, 23, 4, 20], 6);
+// minEatingSpeed(
+//   [
+//     332484035, 524908576, 855865114, 632922376, 222257295, 690155293, 112677673,
+//     679580077, 337406589, 290818316, 877337160, 901728858, 679284947, 688210097,
+//     692137887, 718203285, 629455728, 941802184,
+//   ],
+//   823855818,
+// );
+// minEatingSpeed(
+//   [
+//     848219518, 588431922, 679783979, 432047681, 558963869, 874763943, 356682090,
+//     514921461, 639400033, 842625686, 737707391, 663203571, 195860905, 278665278,
+//     886595950, 837136539, 649029499, 866615005, 314734742, 888429433, 348422147,
+//     634905317, 222096525, 926976060, 731794241, 636342449, 57112531, 790567866,
+//     296797429, 756486656, 972612015, 439134823, 20840594, 812172762, 722611086,
+//     617646271, 594776717, 912921645, 892159640, 674448885, 645585171, 658634155,
+//     78508257, 946709338, 376077435, 846624429, 996828412, 236496810, 946919361,
+//     414390039, 60947718, 973801466, 452874238, 334628044, 117140771, 402855733,
+//     278663893, 259369536, 159585958, 501119979, 992853641, 292301385, 614052668,
+//     417035905, 172421780, 669155352, 214329208, 96847320, 398325069, 739265267,
+//     444152648, 820224819, 741012408, 656370372, 750877554, 562792394, 269958723,
+//     158621149, 242126959, 211043846, 48918663, 759208762, 16593653, 233539975,
+//   ],
+//   558918813,
+// );
+// minEatingSpeed([3, 6, 7, 100, 1, 1, 1, 1, 1], 10);
