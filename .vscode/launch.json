@@ -20,6 +20,13 @@
       "program": "${file}",
       "preLaunchTask": "tsc: build - tsconfig.json",
       "outFiles": ["${workspaceFolder}/out/**/*.js"]
+    },
+    {
+      "name": "Launch File with tsx",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "pnpm",
+      "args": ["tsx", "${file}"]
     }
   ]
 }
